@@ -12,7 +12,9 @@ app.use(express.json());
 
 app.use(cookieParser());
 
+// ROUTES ->
 app.use("/api/auth", authRoute);
+app.use("/api/message", messsageRoute)
 
 app.listen(PORT, () => {
     console.log(`App is running on port ${PORT}`);
