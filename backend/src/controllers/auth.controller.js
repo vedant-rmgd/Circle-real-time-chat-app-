@@ -110,7 +110,7 @@ export const updateProfile = async (req, res) => {
             throw new apiError(404, "profil pic local path not found");
         }
 
-        const uploadResponse = await uploadOnCloudinary(profilePicLocalPath)
+        const uploadResponse = await uploadOnCloudinary(profilePicLocalPath);
 
         if (!uploadResponse) {
             throw new apiError(404, "Didn't got response from cloudinary");
@@ -137,6 +137,22 @@ export const updateProfile = async (req, res) => {
                     200,
                     updatedUser,
                     "user profile pic is successfully updated"
+                )
+            );
+    } catch (error) {
+        throw new apiError(400, error?.message);
+    }
+};
+
+export const checkAuth = (req, res) => {
+    try {
+        return res
+            .status(200)
+            .json(
+                new apiResponse(
+                    200,
+                    req.user,
+                    "Featched authenticated user successfully"
                 )
             );
     } catch (error) {
