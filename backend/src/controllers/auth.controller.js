@@ -3,6 +3,7 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/gen-JWT-token.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 export const signup = async (req, res) => {
     const { fullName, email, password } = req.body;
@@ -60,7 +61,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
-    console.log("email and password", email, password)
+    console.log("email and password", email, password);
 
     try {
         if (!(email && password)) {
@@ -95,6 +96,49 @@ export const logout = (req, res) => {
         return res
             .status(200)
             .json(new apiResponse(200, "user logged out successfully"));
+    } catch (error) {
+        throw new apiError(400, error?.message);
+    }
+};
+
+export const updateProfile = async (req, res) => {
+    const profilePicLocalPath = req.file?.path;
+    const userId = req.user._id;
+
+    try {
+        if (!profilePicLocalPath) {
+            throw new apiError(404, "profil pic local path not found");
+        }
+
+        const uploadResponse = await uploadOnCloudinary(profilePicLocalPath)
+
+        if (!uploadResponse) {
+            throw new apiError(404, "Didn't got response from cloudinary");
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                profilePic: uploadResponse.secure_url,
+            },
+            {
+                new: true,
+            }
+        );
+
+        if (!updatedUser) {
+            throw new apiError(404, "User with updated profile pic not found!");
+        }
+
+        return res
+            .status(200)
+            .json(
+                new apiResponse(
+                    200,
+                    updatedUser,
+                    "user profile pic is successfully updated"
+                )
+            );
     } catch (error) {
         throw new apiError(400, error?.message);
     }
