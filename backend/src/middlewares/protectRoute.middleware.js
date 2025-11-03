@@ -19,6 +19,8 @@ export const protectRoute = async (req, res, next) => {
             throw new apiError(400, "Unauthorized, Invalid token");
         }
 
+        console.log("decoded token : ", decodedToken)
+
         // if the decoded token is present, check the user in the data base
         const user = await User.findById(decodedToken.userId).select(
             "-password"
