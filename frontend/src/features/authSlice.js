@@ -8,6 +8,7 @@ const initialState = {
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
+    isRemovingProfilePic: false,
     onlineUsers: [],
 };
 
@@ -31,6 +32,9 @@ const authSlice = createSlice({
         setIsUpdatingProfile: (state, action) => {
             state.isUpdatingProfile = action.payload;
         },
+        setIsRemovingProfilePic: (state, action) => {
+            state.isRemovingProfilePic = action.payload;
+        },
         setOnlineUsers: (state, action) => {
             state.onlineUsers = action.payload;
         },
@@ -47,6 +51,7 @@ export const {
     setIsSigningUp,
     setIsLoggingIn,
     setIsUpdatingProfile,
+    setIsRemovingProfilePic,
     setOnlineUsers,
     logoutUser,
 } = authSlice.actions;
@@ -82,18 +87,18 @@ export const signup = (data) => async (dispatch) => {
 };
 
 export const login = (data) => async (dispatch) => {
-    dispatch(setIsLoggingIn(true))
+    dispatch(setIsLoggingIn(true));
     try {
-        const response = await axiosInstance.post("/auth/login", data)
-        dispatch(setAuthUser(response.data.data))
+        const response = await axiosInstance.post("/auth/login", data);
+        dispatch(setAuthUser(response.data.data));
         toast.success("User is loggedin successfully");
     } catch (error) {
         toast.error(error.response?.data?.message || "Login failed");
         console.log("Error in logging in (frontend) -> ", error?.message);
     } finally {
-        dispatch(setIsLoggingIn(false))
+        dispatch(setIsLoggingIn(false));
     }
-}
+};
 
 export const logout = () => async (dispatch) => {
     try {
@@ -102,5 +107,35 @@ export const logout = () => async (dispatch) => {
         toast.success("Logged out successfully");
     } catch (error) {
         toast.error(error.response?.data?.message || "Logout failed");
+    }
+};
+
+export const updateProfile = (data) => async (dispatch) => {
+    dispatch(setIsUpdatingProfile(true));
+    try {
+        const response = await axiosInstance.put("/auth/update-profile", data);
+        dispatch(setAuthUser(response.data.data));
+        toast.success("Profile pic updated successfully");
+    } catch (error) {
+        toast.error(
+            error.response?.data?.message || "Failed to update profile pic"
+        );
+    } finally {
+        dispatch(setIsUpdatingProfile(false));
+    }
+};
+
+export const removeProfilePic = () => async (dispatch) => {
+    dispatch(setIsRemovingProfilePic(true));
+    try {
+        const response = await axiosInstance.patch("/auth/remove-profile-pic");
+        dispatch(setAuthUser(response.data.data));
+        toast.success("Profile pic removed successfully");
+    } catch (error) {
+        toast.error(
+            error.response?.data?.message || "Failed to remove profile pic"
+        );
+    } finally {
+        dispatch(setIsRemovingProfilePic(false));
     }
 };

@@ -40,7 +40,7 @@ export const signup = async (req, res) => {
             // generate JWT token
             await newUser.save();
             generateToken(newUser._id, res);
-            
+
             return res
                 .status(200)
                 .json(
@@ -141,6 +141,36 @@ export const updateProfile = async (req, res) => {
             );
     } catch (error) {
         throw new apiError(400, error?.message);
+    }
+};
+
+export const deleteProfilePic = async (req, res) => {
+    const userId = req.user._id;
+    try {
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {
+                profilePic: null,
+            },
+            {
+                new: true,
+            }
+        );
+
+        if (!user) {
+            throw new apiError(
+                400,
+                "user not found while removing profile pic"
+            );
+        }
+
+        return res
+            .status(200)
+            .json(
+                new apiResponse(200, user, "Profile pic removed successfully")
+            );
+    } catch (error) {
+        throw new apiError(400, "can't remove profile pic");
     }
 };
 
