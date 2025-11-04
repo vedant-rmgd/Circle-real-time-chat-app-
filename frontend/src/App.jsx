@@ -20,8 +20,6 @@ function App() {
         dispatch(checkAuth());
     }, []);
 
-    console.log("Auth User in app.jsx : ", authUser);
-
     if (isCheckingAuth && !authUser) {
         return (
             <div className="flex items-center justify-center h-screen">

@@ -1,6 +1,4 @@
 import { useState, useId } from "react";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
     Eye,
     EyeOff,
@@ -10,10 +8,12 @@ import {
     MessageSquare,
     User,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
 import { signup } from "../features/authSlice.js";
-import { useNavigate } from "react-router-dom";
 
 function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);
@@ -25,28 +25,28 @@ function SignupPage() {
         email: "",
         password: "",
     });
-    const isSigningUp = useSelector((state) => state.isSigningUp);
+    const isSigningUp = useSelector((state) => state.auth.isSigningUp);
     const dispatch = useDispatch();
-    // const navigate = useNavigate()
 
     const validateForm = () => {
-      if (!formData.fullName.trim() ) return toast.error("Full Name is required")
-      if (!formData.email.trim() ) return toast.error("Email is required")
-      if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
-      if (!formData.password) return toast.error("Password is required");
-      if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+        if (!formData.fullName.trim())
+            return toast.error("Full Name is required");
+        if (!formData.email.trim()) return toast.error("Email is required");
+        if (!/\S+@\S+\.\S+/.test(formData.email))
+            return toast.error("Invalid email format");
+        if (!formData.password) return toast.error("Password is required");
+        if (formData.password.length < 6)
+            return toast.error("Password must be at least 6 characters");
 
-      return true
+        return true;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const success = validateForm()
+        const success = validateForm();
 
-        if (success===true) dispatch(signup(formData))
-
-        // navigate("/")
+        if (success === true) dispatch(signup(formData));
     };
 
     return (
@@ -81,7 +81,7 @@ function SignupPage() {
                                 </span>
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                     <User className="size-5 text-base-content/40" />
                                 </div>
                                 <input
@@ -107,7 +107,7 @@ function SignupPage() {
                                 </span>
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                     <Mail className="size-5 text-base-content/40" />
                                 </div>
                                 <input
@@ -133,7 +133,7 @@ function SignupPage() {
                                 </span>
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                     <Lock className="size-5 text-base-content/40" />
                                 </div>
                                 <input
