@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 const initialState = {
     messages: [],
     users: [],
-    onlineUsers : [],
     selectedUser: null,
     isUsersLoading: false,
     isMessageLoading: false,
@@ -76,6 +75,8 @@ export const getMessages = (userId) => async (dispatch) => {
 };
 
 export const sendMessage = (selectedUserId, messageData) => async (dispatch) => {
+    console.log("send message fun is running")
+    console.log("is the the message object", messageData)
     try {
         const response = await axiosInstance.post(
             `/message/send-message/${selectedUserId}`,

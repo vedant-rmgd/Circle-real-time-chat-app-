@@ -9,7 +9,7 @@ function Sidebar() {
   const users = useSelector((state) => state.chat.users)
   const selectedUser = useSelector((state) => state.chat.selectedUser)
   const isUserLoading = useSelector((state) => state.chat.isUsersLoading)
-  const onlineUsers = useSelector((state) => state.chat.onlineUsers)
+  const onlineUsers = useSelector((state) => state.auth.onlineUsers)
   const dispatch = useDispatch()
 
   useEffect(() => {
