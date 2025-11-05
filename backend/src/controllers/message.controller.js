@@ -85,9 +85,38 @@ export const sendMessage = async (req, res) => {
         return res
             .status(200)
             .json(
-                new apiResponse(200, message, "message has been successfully send")
+                new apiResponse(
+                    200,
+                    message,
+                    "message has been successfully send"
+                )
             );
     } catch (error) {
         throw new apiError(400, error?.message);
+    }
+};
+
+export const deleteMessage = async (req, res) => {
+    const messageId = req.params.id;
+    try {
+        const message = await Message.findById(messageId);
+        if (!message) {
+            throw new apiError(400, "Message not found");
+        }
+
+        // Only the sender can delete their message
+        if (message.sendersId.toString() !== req.user._id.toString()) {
+            throw new apiError(400, "Not Authorized");
+        }
+
+        await message.deleteOne();
+
+        return res
+            .status(200)
+            .json(new apiResponse(200, "message is deleted successfully"));
+
+    } catch (error) {
+        console.log("Error deleting message:", error);
+        throw new apiError(500, error?.message)
     }
 };

@@ -23,6 +23,12 @@ export const chatSlice = createSlice({
         addMessages: (state, action) => {
             state.messages.push(action.payload);
         },
+        removeMessage: (state, action) => {
+            state.messages = state.messages.filter(
+                (msg) => msg._id !== action.payload
+            );
+        },
+
         setSelectedUser: (state, action) => {
             state.selectedUser = action.payload;
         },
@@ -42,6 +48,7 @@ export const {
     setSelectedUser,
     setIsUsersLoading,
     setIsMessageLoading,
+    removeMessage
 } = chatSlice.actions;
 export default chatSlice.reducer;
 
@@ -74,18 +81,31 @@ export const getMessages = (userId) => async (dispatch) => {
     }
 };
 
-export const sendMessage = (selectedUserId, messageData) => async (dispatch) => {
-    console.log("send message fun is running")
-    console.log("is the the message object", messageData)
+export const sendMessage =
+    (selectedUserId, messageData) => async (dispatch) => {
+        console.log("send message fun is running");
+        console.log("is the the message object", messageData);
+        try {
+            const response = await axiosInstance.post(
+                `/message/send-message/${selectedUserId}`,
+                messageData
+            );
+            dispatch(addMessages(response.data.data));
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to send message"
+            );
+        }
+    };
+
+export const deleteMessage = (messageId) => async (dispatch) => {
     try {
-        const response = await axiosInstance.post(
-            `/message/send-message/${selectedUserId}`,
-            messageData
-        );
-        dispatch(addMessages(response.data.data));
+        await axiosInstance.delete(`/message/delete-message/${messageId}`);
+        dispatch(removeMessage(messageId));
+        toast.success("Message deleted");
     } catch (error) {
         toast.error(
-            error.response?.data?.message || "Failed to send message"
+            error.response?.data?.message || "Failed to delete message"
         );
     }
 };
