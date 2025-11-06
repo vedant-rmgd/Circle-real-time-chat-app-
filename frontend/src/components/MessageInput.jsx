@@ -10,8 +10,6 @@ function MessageInput() {
     const selectedUser = useSelector((state) => state.chat.selectedUser);
     const dispatch = useDispatch();
 
-    console.log("text fromthe input ->", text);
-
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -46,7 +44,6 @@ function MessageInput() {
 
         try {
             dispatch(sendMessage(selectedUser._id, formData));
-
             setText("");
             setImagePreview(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -68,7 +65,7 @@ function MessageInput() {
                         <button
                             onClick={removeImage}
                             className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
-              flex items-center justify-center"
+                            flex items-center justify-center"
                             type="button"
                         >
                             <X className="size-3" />

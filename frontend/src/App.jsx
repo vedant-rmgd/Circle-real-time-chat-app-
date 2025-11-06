@@ -14,12 +14,15 @@ import { Toaster } from "react-hot-toast";
 function App() {
     const authUser = useSelector((state) => state.auth.authUser);
     const isCheckingAuth = useSelector((state) => state.auth.isCheckingAuth);
+    const onlineUsers = useSelector((state) => state.auth.onlineUsers)
     const theme = useSelector((state) => state.theme.theme)
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(checkAuth());
     }, []);
+
+    console.log("Online users array : ",onlineUsers)
 
     if (isCheckingAuth && !authUser) {
         return (

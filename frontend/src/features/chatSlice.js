@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { socket } from "../lib/socket";
 
 const initialState = {
     messages: [],
@@ -48,7 +49,7 @@ export const {
     setSelectedUser,
     setIsUsersLoading,
     setIsMessageLoading,
-    removeMessage
+    removeMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;
 
@@ -108,4 +109,21 @@ export const deleteMessage = (messageId) => async (dispatch) => {
             error.response?.data?.message || "Failed to delete message"
         );
     }
+};
+
+export const subscribeToMessages = (selectedUser) => (dispatch) => {
+    if (!selectedUser) return;
+
+    socket.on("newMessage", (message) => {
+        if (
+            message.sendersId !== selectedUser._id &&
+            message.reciversId !== selectedUser._id
+        )
+            return;
+        dispatch(addMessages(message));
+    });
+};
+
+export const unSubscribeToMessages = () => () => {
+    socket.off("newMessage");
 };

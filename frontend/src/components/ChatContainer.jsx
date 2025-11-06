@@ -6,6 +6,7 @@ import MessageInput from "./MessageInput.jsx";
 import { useEffect, useRef, useState } from "react";
 import { formatMessageTime } from "../lib/formatTime.js";
 import { Trash } from "lucide-react";
+import { subscribeToMessages, unSubscribeToMessages } from "../features/chatSlice.js";
 
 function ChatContainer() {
     const messages = useSelector((state) => state.chat.messages);
@@ -20,9 +21,20 @@ function ChatContainer() {
     const dispatch = useDispatch();
     const messageEndRef = useRef(null);
 
+    console.log("messages in chat", messages)
+
     useEffect(() => {
         dispatch(getMessages(selectedUser._id));
-    }, [selectedUser._id]);
+        dispatch(subscribeToMessages(selectedUser))
+
+        return () => dispatch(unSubscribeToMessages())
+    }, [selectedUser._id, subscribeToMessages, unSubscribeToMessages]);
+
+    useEffect(() => {
+        if (messageEndRef.current && messages) {
+            messageEndRef.current.scrollIntoView({behavior: "smooth"})
+        }
+    },[messages])
 
     const handleRightClick = (e, id) => {
         console.log("right click is pressed");
@@ -35,7 +47,7 @@ function ChatContainer() {
         longPressTimer.current = setTimeout(() => {
             setSelectedMessageId(id);
             setShowDeleteIcon(true);
-        }, 300); // 600ms press duration
+        }, 300);
     };
 
     const handleLongPressEnd = () => {
@@ -75,7 +87,6 @@ function ChatContainer() {
                                 ? "chat-end"
                                 : "chat-start"
                         }`}
-                        ref={messageEndRef}
                     >
                         <div className=" chat-image avatar">
                             <div className="size-10 rounded-full border">
@@ -97,7 +108,7 @@ function ChatContainer() {
                             </time>
                         </div>
 
-                        <div className="flex flex-col relative items-end">
+                        <div className="flex flex-col relative items-end" ref={messageEndRef}>
                             {message.image && (
                                 <div className="relative">
                                     <img

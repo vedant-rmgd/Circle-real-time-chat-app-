@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { socket } from "../lib/socket.js";
+
 
 const initialState = {
-    authUser: null, // info about authenticated user
-    isCheckingAuth: true, // when ever user refreshes a page we will check if user is loggedin or not
+    authUser: null,
+    isCheckingAuth: true, 
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
@@ -62,8 +64,8 @@ export const checkAuth = () => async (dispatch) => {
     dispatch(setIsCheckingAuth(true));
     try {
         const response = await axiosInstance.get("/auth/check");
-        console.log("response from backend : ", response);
         dispatch(setAuthUser(response.data.data));
+        dispatch(connectSocket(response.data.data._id));
     } catch (error) {
         console.log("Error in checkAuth", error?.message);
         dispatch(setAuthUser(null));
@@ -78,6 +80,7 @@ export const signup = (data) => async (dispatch) => {
         const response = await axiosInstance.post("/auth/signup", data);
         dispatch(setAuthUser(response.data.data));
         toast.success("account has been successfully created");
+        dispatch(connectSocket(response.data.data._id));
     } catch (error) {
         toast.error(error.response?.data?.message || "Signup failed");
         console.log("Error in signing up (frontend) -> ", error?.message);
@@ -92,6 +95,7 @@ export const login = (data) => async (dispatch) => {
         const response = await axiosInstance.post("/auth/login", data);
         dispatch(setAuthUser(response.data.data));
         toast.success("User is loggedin successfully");
+        dispatch(connectSocket(response.data.data._id));
     } catch (error) {
         toast.error(error.response?.data?.message || "Login failed");
         console.log("Error in logging in (frontend) -> ", error?.message);
@@ -105,6 +109,7 @@ export const logout = () => async (dispatch) => {
         await axiosInstance.post("/auth/logout");
         dispatch(logoutUser());
         toast.success("Logged out successfully");
+        dispatch(disConnectSocket());
     } catch (error) {
         toast.error(error.response?.data?.message || "Logout failed");
     }
@@ -138,4 +143,20 @@ export const removeProfilePic = () => async (dispatch) => {
     } finally {
         dispatch(setIsRemovingProfilePic(false));
     }
+};
+
+export const connectSocket = (userId) => (dispatch) => {
+    if (!userId) return;
+    if (socket.connected) return;
+
+    socket.io.opts.query = {userId}
+    socket.connect();
+
+    socket.on("getOnlineUsers", (userIds) => {
+        dispatch(setOnlineUsers(userIds))
+    })
+};
+
+export const disConnectSocket = () => () => {
+    if (socket?.connected) socket.disconnect();
 };

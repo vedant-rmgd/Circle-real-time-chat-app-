@@ -3,6 +3,8 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
+import { getReciversSocketId, io } from "../lib/socket.js";
+
 
 export const getUsersForSideBar = async (req, res) => {
     const loggedInUserId = req.user._id;
@@ -81,6 +83,12 @@ export const sendMessage = async (req, res) => {
         });
 
         await message.save();
+
+        const reciversSocketId = getReciversSocketId(reciversId)
+
+        if (reciversSocketId) {
+            io.to(reciversSocketId).emit("newMessage", message)
+        }
 
         return res
             .status(200)
