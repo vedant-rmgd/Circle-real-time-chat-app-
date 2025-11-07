@@ -1,5 +1,5 @@
 import {  useSelector } from "react-redux";
-import Sidebar from "../components/SideBar.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import NoChatSelected from "../components/NoChatSelected.jsx";
 import ChatContainer from "../components/ChatContainer.jsx";
 
