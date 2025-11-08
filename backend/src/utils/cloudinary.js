@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
-import fs from "fs"
+import streamifier from "streamifier";
 
 dotenv.config();
 
@@ -10,22 +10,23 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilepath) => {
-    try {
-        if (!localFilepath) return null;
+export const uploadOnCloudinary = async (fileBuffer) => {
+  try {
+    if (!fileBuffer) return null;
 
-        const response = await cloudinary.uploader.upload(localFilepath, {
-            resource_type: "auto",
-        });
+    return await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: "auto", folder: "circle-app" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
 
-        console.log("file is successfully upload on cloudinary", response.url);
-
-        fs.unlinkSync(localFilepath);
-        return response;
-    } catch (error) {
-        fs.unlinkSync(localFilepath); //removes the locally saved temp files as the upload operation failed
-        return null;
-    }
+      streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+    });
+  } catch (error) {
+    console.error("Cloudinary upload failed:", error);
+    return null;
+  }
 };
-
-export { uploadOnCloudinary };

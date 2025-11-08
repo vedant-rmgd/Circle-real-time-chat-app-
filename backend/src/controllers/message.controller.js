@@ -62,15 +62,15 @@ export const sendMessage = async (req, res) => {
 
     let imageUrl;
     try {
-        const imageLocalPath = req.file?.path;
+        const imageBuffer = req.file?.buffer;
 
-        if (!(text || imageLocalPath)) {
+        if (!(text || imageBuffer)) {
             throw new apiError(400, "text or image is required");
         }
 
-        if (imageLocalPath) {
+        if (imageBuffer) {
             const responseFromCloudinary = await uploadOnCloudinary(
-                imageLocalPath
+                imageBuffer
             );
             imageUrl = responseFromCloudinary.secure_url;
         }
