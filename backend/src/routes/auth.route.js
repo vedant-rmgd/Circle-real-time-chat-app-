@@ -17,4 +17,8 @@ router.patch("/remove-profile-pic", protectRoute, deleteProfilePic)
 
 router.get("/check", protectRoute, checkAuth)
 
+router.get("/alive-check", (req, res) => {
+  res.status(200).json({ message: "Server is alive" });
+});
+
 export default router;
