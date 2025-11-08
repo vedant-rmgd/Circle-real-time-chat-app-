@@ -102,7 +102,7 @@ export const logout = (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-    const profilePicLocalPath = req.file?.path;
+    const profilePicLocalPath = req.file?.buffer;
     const userId = req.user._id;
 
     try {
